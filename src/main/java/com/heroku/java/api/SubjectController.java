@@ -1,5 +1,6 @@
 package com.heroku.java.api;
 
+import com.heroku.java.dto.SubjectDTO;
 import com.heroku.java.services.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @GetMapping("/api/subjects")
-    public ResponseEntity<Iterable<com.heroku.java.models.Subject>> getAllSubjects() {
-        return new ResponseEntity<>(subjectService.findAllSubjects(), HttpStatus.OK);
+    public ResponseEntity<Iterable<SubjectDTO>> getAllSubjects() {
+        return new ResponseEntity<>(subjectService.findAllSubjectDTOs(), HttpStatus.OK);
     }
 }

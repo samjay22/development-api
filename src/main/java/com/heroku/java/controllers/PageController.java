@@ -1,57 +1,65 @@
 package com.heroku.java.controllers;
 
-import com.heroku.java.dto.TeacherDTO;
-import com.heroku.java.models.Subject;
+import com.heroku.java.dto.SubjectDTO;
 import com.heroku.java.services.SubjectService;
-import com.heroku.java.services.TeacherSubjectService;
-import com.heroku.java.services.VisitTrackingService;
+import com.heroku.java.services.TeacherService;
+import com.heroku.java.services.TestimonialService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.IOException;
+
 @Controller
 @RequiredArgsConstructor
 public class PageController {
-    private final TeacherSubjectService teacherSubjectService;
-    private final VisitTrackingService visitTrackingService;
+    private final SubjectService subjectService;
+    private final TeacherService teacherService;
+    private final TestimonialService testimonialService;
 
     @GetMapping("/")
     public String index(HttpServletRequest request) {
-        visitTrackingService.trackVisit(request);
         return "index";
     }
 
     @GetMapping("/about")
     public String about(HttpServletRequest request) {
-        visitTrackingService.trackVisit(request);
         return "about";
     }
 
     @GetMapping("/contact")
     public String contact(HttpServletRequest request, Model model) {
-        visitTrackingService.trackVisit(request);
-        model.addAttribute("subjectOptions", teacherSubjectService.findAllSubjects());
+        Iterable<SubjectDTO> subjects = subjectService.findAllSubjectDTOs();
+        model.addAttribute("subjectOptions", subjects);
+        model.addAttribute("subjects", subjects);
         return "contact";
     }
 
     @GetMapping("/subjects")
     public String subjects(HttpServletRequest request, Model model) {
-        visitTrackingService.trackVisit(request);
+
         // Get subjects from the service and add to the model
-        Iterable<Subject> subjects = teacherSubjectService.findAllSubjects();
-        model.addAttribute("subjects", subjects);
+        model.addAttribute("subjects", subjectService.findAllSubjectDTOs());
 
         // Add teacher data to the model
-        model.addAttribute("teachers", teacherSubjectService.findAllTeachers());
+        model.addAttribute("teachers", teacherService.findAllTeacherDTOs());
 
         return "subjects";
     }
 
+    @GetMapping("/testimonials")
+    public String testimonials(Model model) throws IOException, ClassNotFoundException {
+        model.addAttribute("subjects", subjectService.findAllSubjectDTOs());
+        var a = testimonialService.getStudentTestimonialsDTO();
+        model.addAttribute("testimonials", a);
+        return "testimonials";
+    }
+
     @GetMapping("/error")
     public String error(HttpServletRequest request) {
-        visitTrackingService.trackVisit(request);
         return "error";
     }
+
 }

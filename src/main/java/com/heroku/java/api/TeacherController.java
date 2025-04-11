@@ -1,6 +1,6 @@
 package com.heroku.java.api;
 
-import com.heroku.java.models.Teacher;
+import com.heroku.java.dto.TeacherDTO;
 import com.heroku.java.services.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @GetMapping("/teachers")
-    public ResponseEntity<Iterable<Teacher>> getTeachers(){
-        return new ResponseEntity<>(teacherService.findAllTeachers(), HttpStatus.OK);
+    public ResponseEntity<Iterable<TeacherDTO>> getTeachers(){
+        return new ResponseEntity<>(teacherService.findAllTeacherDTOs(), HttpStatus.OK);
     }
 }

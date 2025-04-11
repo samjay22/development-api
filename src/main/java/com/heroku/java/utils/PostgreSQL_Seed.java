@@ -1,22 +1,193 @@
 package com.heroku.java.utils;
 
-import com.heroku.java.dto.TeacherDTO;
+import com.heroku.java.interfaces.*;
+import com.heroku.java.models.StudentTestimonials;
 import com.heroku.java.models.Subject;
 import com.heroku.java.models.Teacher;
-import com.heroku.java.services.EmailService;
+import com.heroku.java.models.Template;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-public class EmailTemplate {
-    /**
-     * Generates HTML content for email messages
-     *
-     * @param subject Email subject
-     * @param request Email request details
-     * @return Formatted HTML content
-     */
-    public static String getMessageHtml(String subject, EmailService.EmailContactRequest request) {
-        return """
+@Repository
+@RequiredArgsConstructor
+public class PostgreSQL_Seed {
+    private final ITeacherRepository teacherRepository;
+    private final ISubjectRepository subjectRepository;
+    private final IContactRequestRepository contactRequestRepository;
+    private final ITemplateRepository templateRepository;
+    private final IVisitTrackerRepository visitTrackerRepository;
+    private final IStudentTestimonials studentTestimonials;
+
+    private Map<String, Subject> getSubjects(){
+        // Math subjects
+        Subject algebra = new Subject();
+        algebra.setName("Algebra");
+        algebra.setDescription("Study of mathematical symbols and the rules for manipulating these symbols. Covers equations, polynomials, and abstract algebra concepts.");
+        algebra.setActive(true);
+
+        Subject calculus = new Subject();
+        calculus.setName("Calculus");
+        calculus.setDescription("Branch of mathematics focused on limits, functions, derivatives, integrals, and infinite series. Essential for understanding rates of change and accumulation.");
+        calculus.setActive(true);
+
+        Subject linearAlgebra = new Subject();
+        linearAlgebra.setName("Linear Algebra");
+        linearAlgebra.setDescription("Study of linear equations, vectors, vector spaces, and matrices. Foundational for advanced mathematics and applications in engineering and computer science.");
+        linearAlgebra.setActive(true);
+
+// Science subjects
+        Subject computers = new Subject();
+        computers.setName("Computers");
+        computers.setDescription("Study of computing technologies, computer architecture, operating systems, and computer networks. Includes theoretical foundations and practical applications.");
+        computers.setActive(true);
+
+        Subject biology = new Subject();
+        biology.setName("Biology");
+        biology.setDescription("Study of living organisms, their structure, function, growth, evolution, and distribution. Covers cellular biology, genetics, ecology, and evolutionary biology.");
+        biology.setActive(true);
+
+        Subject chemistry = new Subject();
+        chemistry.setName("Chemistry");
+        chemistry.setDescription("Study of matter, its properties, composition, structure, and the changes it undergoes during chemical reactions. Includes organic, inorganic, and physical chemistry.");
+        chemistry.setActive(true);
+
+        Subject physics = new Subject();
+        physics.setName("Physics");
+        physics.setDescription("Study of matter, energy, and the fundamental forces of nature. Covers mechanics, thermodynamics, electromagnetism, relativity, and quantum mechanics.");
+        physics.setActive(true);
+
+        Subject nursing = new Subject();
+        nursing.setName("Nursing");
+        nursing.setDescription("Study of healthcare practices focused on patient care. Includes anatomy, physiology, pharmacology, and clinical skills for medical treatment and patient management.");
+        nursing.setActive(true);
+
+// English subjects
+        Subject englishLiterature = new Subject();
+        englishLiterature.setName("English Literature");
+        englishLiterature.setDescription("Study of literary works in English, including poetry, prose, drama, and criticism. Explores themes, techniques, historical contexts, and cultural significance.");
+        englishLiterature.setActive(true);
+
+        Subject englishLanguage = new Subject();
+        englishLanguage.setName("English Language");
+        englishLanguage.setDescription("Study of the structure, usage, and development of English. Includes grammar, vocabulary, linguistics, composition, rhetoric, and communication skills.");
+        englishLanguage.setActive(true);
+
+// History subjects
+        Subject generalHistory = new Subject();
+        generalHistory.setName("History");
+        generalHistory.setDescription("Study of past events, particularly human affairs. Covers world history, national histories, social, political, economic, and cultural developments through time.");
+        generalHistory.setActive(true);
+
+        Subject philosophy = new Subject();
+        philosophy.setName("Philosophy");
+        philosophy.setDescription("Study of fundamental questions about existence, knowledge, values, reason, mind, and language. Explores ethics, logic, metaphysics, epistemology, and aesthetics.");
+        philosophy.setActive(true);
+
+        Subject religion = new Subject();
+        religion.setName("Religion");
+        religion.setDescription("Study of religious beliefs, behaviors, institutions, and their impact on society. Examines world religions, theology, religious texts, and comparative religious studies.");
+        religion.setActive(true);
+
+// Programming subjects
+        Subject java = new Subject();
+        java.setName("Java");
+        java.setDescription("Object-oriented programming language used for enterprise applications, web development, and Android apps. Covers core syntax, OOP principles, collections, and frameworks.");
+        java.setActive(true);
+
+        Subject python = new Subject();
+        python.setName("Python");
+        python.setDescription("High-level programming language known for readability and versatility. Used in web development, data analysis, AI, and scientific computing. Teaches fundamental programming concepts.");
+        python.setActive(true);
+
+        Subject cPlusPlus = new Subject();
+        cPlusPlus.setName("C++");
+        cPlusPlus.setDescription("General-purpose programming language with object-oriented, generic, and functional features. Used in system software, game development, and performance-critical applications.");
+        cPlusPlus.setActive(true);
+
+        Subject cSharp = new Subject();
+        cSharp.setName("C#");
+        cSharp.setDescription("Object-oriented programming language developed by Microsoft for the .NET platform. Used for Windows applications, game development with Unity, and web services.");
+        cSharp.setActive(true);
+
+        Map<String, Subject> map = new java.util.HashMap<>();
+        map.put("algebra", algebra);
+        map.put("calculus", calculus);
+        map.put("linearAlgebra", linearAlgebra);
+        map.put("computers", computers);
+        map.put("biology", biology);
+        map.put("chemistry", chemistry);
+        map.put("physics", physics);
+        map.put("nursing", nursing);
+        map.put("englishLiterature", englishLiterature);
+        map.put("englishLanguage", englishLanguage);
+        map.put("generalHistory", generalHistory);
+        map.put("philosophy", philosophy);
+        map.put("religion", religion);
+        map.put("java", java);
+        map.put("python", python);
+        map.put("cPlusPlus", cPlusPlus);
+        map.put("cSharp", cSharp);
+
+        return map;
+    }
+    private void seedTeachersSubjects(){
+        Map<String, Subject> subjects = getSubjects();
+
+        Teacher one = new Teacher();
+        one.setPhone("(757)-752-0752");
+        one.setEmail("sam.taylor@sam-technology.org");
+        one.setLastName("Taylor");
+        one.setFirstName("Samuel");
+        one.setActive(true);
+        one.setSubjects(List.of(
+                subjects.get("calculus"),
+                subjects.get("algebra"),
+                subjects.get("linearAlgebra"),
+                subjects.get("computers"),
+                subjects.get("java"),
+                subjects.get("cSharp"),
+                subjects.get("python"),
+                subjects.get("cPlusPlus"),
+                subjects.get("physics"),
+                subjects.get("religion")
+                )
+        );
+
+        Teacher two = new Teacher();
+        two.setPhone("(540)-793-2339");
+        two.setEmail("beth.deel@sam-technology.org");
+        two.setFirstName("Elizabeth");
+        two.setLastName("Deel");
+        two.setActive(true);
+        two.setSubjects(List.of(
+                subjects.get("englishLanguage"),
+                subjects.get("englishLiterature"),
+                subjects.get("generalHistory"),
+                subjects.get("philosophy"),
+                subjects.get("religion"),
+                subjects.get("nursing"),
+                subjects.get("chemistry"),
+                subjects.get("biology")
+        ));
+
+//        two.getSubjects().forEach(subject -> subject.setTeachers(List.of(two)));
+//        one.getSubjects().forEach(subject ->  subject.setTeachers(List.of(two)));
+        subjectRepository.saveAll(subjects.values());
+        teacherRepository.saveAll(List.of(one, two));
+
+//        seedStudentTestimonials(subjects, List.of(one, two));
+    }
+
+    private void seedBaseTemplates(){
+        String emailSeed = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -521,31 +692,71 @@ public class EmailTemplate {
     </div>
 </body>
 </html>
-""".formatted(
-                subject,
-                subject,
-                request.getContactRequest() != null ? request.getContactRequest().getFirstName() + " " + request.getContactRequest().getLastName() : "there",
-                request.getContactRequest() != null ? request.getContactRequest().getFirstName() + " " + request.getContactRequest().getLastName() : "N/A",
-                request.getContactRequest() != null ? request.getContactRequest().getEmail() : request.getTo(),
-                request.getContactRequest() != null ? request.getContactRequest().getPhone() : "N/A",
-                request.getContactRequest() != null ? request.getContactRequest().getMessage() : "N/A",
-                request.getTeacher() != null ? request.getTeacher().getFirstName() + " " + request.getTeacher().getLastName() : "N/A",
-                request.getTeacher() != null ? formatSubjectTags(request.getTeacher()) : "N/A",
-                request.getTeacher() != null ? request.getTeacher().getEmail() : "N/A",
-                request.getTeacher() != null ? request.getTeacher().getEmail() : "N/A",
-                request.getTeacher() != null ? request.getTeacher().getPhone() : "N/A"
-        );
+""";
+
+        Template template = new Template();
+        template.setTemplateType("ContactThanks");
+        template.setTemplateFormat(emailSeed.getBytes());
+        templateRepository.save(template);
     }
 
-    /**
-     * Helper method to format teacher subjects as HTML tags
-     */
-    private static String formatSubjectTags(TeacherDTO teacher) {
-        if (teacher == null || teacher.getSubjects() == null || teacher.getSubjects().isEmpty()) {
-            return "<span class=\"subject-tag\">N/A</span>";
+//    private void seedStudentTestimonials(Map<String, Subject> subjects, List<Teacher> teachers) {
+//            List<StudentTestimonials> testimonials = new ArrayList<>();
+//
+//            testimonials.add(new StudentTestimonials(null, "Amazing course, I learned so much about Algebra!", "John", "Doe",
+//                    "https://example.com/images/john_doe.jpg", 5, subjects.get("algebra"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Calculus was made so easy to understand!", "Jane", "Smith",
+//                    "https://example.com/images/jane_smith.jpg", 4, subjects.get("calculus"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Loved the in-depth explanations in Linear Algebra.", "Robert", "Johnson",
+//                    "https://example.com/images/robert_johnson.jpg", 5, subjects.get("linearAlgebra"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Computers course was very practical and insightful.", "Emily", "Davis",
+//                    "https://example.com/images/emily_davis.jpg", 5, subjects.get("computers"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Biology lessons were detailed and engaging!", "Michael", "Brown",
+//                    "https://example.com/images/michael_brown.jpg", 5, subjects.get("biology"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "I finally understood Chemistry thanks to this course!", "Emma", "Wilson",
+//                    "https://example.com/images/emma_wilson.jpg", 4, subjects.get("chemistry"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Physics concepts were explained so brilliantly!", "Christopher", "Martinez",
+//                    "https://example.com/images/christopher_martinez.jpg", 5, subjects.get("physics"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "This nursing course boosted my confidence as a caregiver.", "Sophia", "Anderson",
+//                    "https://example.com/images/sophia_anderson.jpg", 5, subjects.get("nursing"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "English Literature has never been more fascinating.", "Alexander", "Thomas",
+//                    "https://example.com/images/alexander_thomas.jpg", 4, subjects.get("englishLiterature"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Improved my grammar and communication skills a lot.", "Olivia", "Taylor",
+//                    "https://example.com/images/olivia_taylor.jpg", 5, subjects.get("englishLanguage"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "History lessons were so engaging and easy to follow.", "Liam", "Harris",
+//                    "https://example.com/images/liam_harris.jpg", 5, subjects.get("generalHistory"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Loved discussing real-world philosophical questions.", "Isabella", "Lewis",
+//                    "https://example.com/images/isabella_lewis.jpg", 4, subjects.get("philosophy"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "The religion course deepened my understanding.", "James", "Walker",
+//                    "https://example.com/images/james_walker.jpg", 5, subjects.get("religion"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Java programming was fun and very practical.", "Charlotte", "Hall",
+//                    "https://example.com/images/charlotte_hall.jpg", 5, subjects.get("java"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "Loved the simplicity and effectiveness this Python course offered.", "Benjamin", "Allen",
+//                    "https://example.com/images/benjamin_allen.jpg", 5, subjects.get("python"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "C++ was challenging but very rewarding to learn!", "Amelia", "Young",
+//                    "https://example.com/images/amelia_young.jpg", 4, subjects.get("cPlusPlus"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "C# course was well-structured and easy to follow.", "Elijah", "King",
+//                    "https://example.com/images/elijah_king.jpg", 5, subjects.get("cSharp"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "The Algebra course rekindled my love for mathematics.", "Grace", "Scott",
+//                    "https://example.com/images/grace_scott.jpg", 4, subjects.get("algebra"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "I enjoyed the hands-on projects in Computers.", "William", "Harris",
+//                    "https://example.com/images/william_harris.jpg", 5, subjects.get("computers"), new Date()));
+//            testimonials.add(new StudentTestimonials(null, "The Physics teacher was amazing and very helpful!", "Ella", "Lee",
+//                    "https://example.com/images/ella_lee.jpg", 5, subjects.get("physics"), new Date()));
+//
+//            studentTestimonials.saveAll(testimonials);
+//
+//    }
+
+    @PostConstruct
+    public void seed(){
+        if(teacherRepository.count() == 0){
+            seedTeachersSubjects();
         }
-        return teacher.getSubjects().stream()
-                .map(subject -> "<span class=\"subject-tag\">" + subject.getName() + "</span>")
-                .collect(Collectors.joining(" "));
+
+        if(templateRepository.count() == 0){
+            seedBaseTemplates();
+        }
+
     }
 }
